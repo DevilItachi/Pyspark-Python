@@ -3,6 +3,7 @@ type(spark)
 
 # COMMAND ----------
 
+# DBTITLE 1,Spark_session
 dir(spark)
 
 # COMMAND ----------
@@ -11,6 +12,7 @@ help(spark.createDataFrame)
 
 # COMMAND ----------
 
+# DBTITLE 1,Create DF
 my_list = [1,2,3,4,5]
 df = spark.createDataFrame(data = my_list)
 df.show()       # shows in form of dataframe text based
@@ -533,3 +535,244 @@ display(df5)
 
 df.select(df.name,df.age).show()
 df.select("*").show()
+
+# COMMAND ----------
+
+# Joins
+df_emp= spark.read.format("csv") \
+        .option("header", "true") \
+        .option("inferSchema", "true") \
+        .load("/Volumes/pyspark_python/pyspark/ext_vol/Emp_Dept/employees.csv")
+df_dept = spark.read.format("csv") \
+        .option("header", "true") \
+        .option("inferSchema", "true") \
+        .load("/Volumes/pyspark_python/pyspark/ext_vol/Emp_Dept/departments.csv")
+              
+(df_emp.join(df_dept, df_emp.DEPARTMENT_ID == df_dept.DEPARTMENT_ID, "inner")) # inner join
+(df_emp.join(df_dept, df_emp.DEPARTMENT_ID == df_dept.DEPARTMENT_ID, "left")) # left join
+(df_emp.join(df_dept, df_emp.DEPARTMENT_ID == df_dept.DEPARTMENT_ID, "right")) # right join
+(df_emp.join(df_dept, df_emp.DEPARTMENT_ID == df_dept.DEPARTMENT_ID, "full"))    #full join
+
+# left semi - only matched rows from left df and columns from only left df
+# left anti - only unmatched rows from left df and columns from only left df
+# join with multiple conditions
+
+# self join
+from pyspark.sql.functions import *
+
+df6 = df_emp.alias("e1").join(df_emp.alias("e2"), col("e1.DEPARTMENT_ID") == col("e2.DEPARTMENT_ID"))
+display(df6)
+
+
+# COMMAND ----------
+
+#when and otherwise
+# similar to case statement in SQL
+
+from pyspark.sql.functions import *
+
+display(df_emp)
+
+# COMMAND ----------
+
+# pivot used to rotate data in 1 column into multiple column
+# it is an aggregration where one of the grouping column value will be converted in individual column
+# rows become column
+
+display(df_emp.groupby("department_id").pivot("Job_id").count())
+
+# COMMAND ----------
+
+display(df_emp.groupby("department_id").pivot("Job_id", ["FI_ACCOUNT"]).count())
+
+# COMMAND ----------
+
+# unpivot 
+#column to row
+
+
+
+# COMMAND ----------
+
+# fill & fillna
+# used to replace null/none on all or selected multiple DF column with either zero, empty  string or any other value
+# fillna(value) only applies to columns whose data type matches the type of value.
+from pyspark.sql import Row
+
+data = [
+    Row(name=None, age=25, city=None),
+    Row(name="Alice", age=None, city="New York"),
+    Row(name="Bob", age=30, city=None),
+    Row(name=None, age=None, city="London"),
+    Row(name="Charlie", age=35, city=None),
+    Row(name=None, age=None, city=None),
+    Row(name="David", age=None, city="Paris"),
+    Row(name=None, age=40, city="Berlin"),
+    Row(name="Eve", age=None, city=None),
+    Row(name=None, age=28, city="Tokyo")
+]
+
+df_nulls = spark.createDataFrame(data)
+display(df_nulls)
+df1= df_nulls.fillna(0)  # only age will be 0
+display(df1)
+
+
+# COMMAND ----------
+
+df2 = df_nulls.fillna("Unknown") # only string will be unkwown, age wont be affected
+display(df2)
+
+
+# COMMAND ----------
+
+df3 = df_nulls.fillna("unknown", subset=["name"]) # only applies to 1 column
+display(df3)
+
+
+# COMMAND ----------
+
+df4 = df_nulls.fillna("none", subset=["name", "city"]) #applies to both or all column speciefied in list
+display(df4)
+
+
+# COMMAND ----------
+
+df5 = df_nulls.fillna({"age": 0, "city": "Unknown"}) # applies to specific column with diff datatype
+display(df5)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Samples
+
+# COMMAND ----------
+
+df = spark.range(start =1 , end=10)
+display(df)
+
+
+# COMMAND ----------
+
+df.sample(fraction=0.5).show()  # sample means it will return subset of original data. each time it will be different
+
+# COMMAND ----------
+
+df.sample(fraction=0.5, seed = 0.1).show()  # generate subset of original data with seed, i.e same values will be created , if want to change value change the  seed value
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC collect()
+# MAGIC
+# MAGIC Retrieves all elements in a df as an array of row type to driver node
+# MAGIC
+# MAGIC It is an action, hence doesnt return a DF, instead return data in array
+# MAGIC
+# MAGIC use it for small DF , for large data set it will show out of memory
+
+# COMMAND ----------
+
+df1 = df.collect()
+print(df1)
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Dataframe Transform
+
+# COMMAND ----------
+
+def doublenumber(df):
+    return df.withColumn("doube_number",df.id*2)
+
+df2 = df.transform(doublenumber)
+display(df2)
+
+# create a function and then use it with df.transform
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Temp views
+
+# COMMAND ----------
+
+# local temp
+df.createOrReplaceTempView("temp")
+
+spark.sql("select * from temp").show()
+
+
+# COMMAND ----------
+
+# global temp
+# can be accessed across multiple session
+# global temp view are stored in global_temp schema
+df.createOrReplaceGlobalTempView("global_temp")
+spark.sql("select * from global_temp.global_temp").show()
+
+# COMMAND ----------
+
+spark.catalog.currentDatabase
+
+# COMMAND ----------
+
+spark.catalog.listDatabases()
+spark.catalog.listTables()
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC UDF
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Partition by
+
+# COMMAND ----------
+
+df2 = (
+    spark.read
+    .format("csv")
+    .option("header", "True")
+    .option("inferSchema", "true")
+    .load( ["/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-100.csv",
+           "/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-1000.csv",
+           "/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-10000.csv"])
+)
+display(df2)
+
+# COMMAND ----------
+
+df2.write.parquet("/Volumes/pyspark_python/pyspark/ext_vol/Output/partition", mode = "overwrite", partitionBy="Country")
+
+#  data is stored in location in  partition by country
+# for each country a sseprate folder will be created
+#  when you read data from specific country folder only that data will be read
+
+#  how to combine data now into a single df/table?
+
+# COMMAND ----------
+
+# rank , dense rank , row_number
+
+from pyspark.sql.window import Window
+from pyspark.sql.functions import rank, dense_rank, row_number
+df = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("/Volumes/pyspark_python/pyspark/ext_vol/Emp_Dept/employees.csv")
+display(df)
+
+# COMMAND ----------
+
+from pyspark.sql.window import Window
+
+window_spec = Window.partitionBy("department_id").orderBy( "salary")
+
+window_df = df.withColumn(
+    "row_number",
+    row_number().over(window_spec)
+)
+display(window_df)
