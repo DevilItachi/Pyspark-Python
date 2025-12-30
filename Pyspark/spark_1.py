@@ -4,7 +4,7 @@ type(spark)
 # COMMAND ----------
 
 # DBTITLE 1,Spark_session
-dir(spark)
+dir(spark)  #shows all function that can be used by spark
 
 # COMMAND ----------
 
@@ -94,7 +94,7 @@ df2 = (
 
 # COMMAND ----------
 
-df1.count()
+df2.count()
 
 # COMMAND ----------
 
@@ -110,11 +110,23 @@ df1.count()
 #   4. Error -- if file already exists, throws an error
 
 
-df1.write.csv("/Volumes/pyspark_python/pyspark/ext_vol/Output/Customers_data", header= True , mode = "overwrite")
+df2.write.csv("/Volumes/pyspark_python/pyspark/ext_vol/Output/Customers_data", header= True , mode = "overwrite")
 
 # COMMAND ----------
 
-df1.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
+df2.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
+
+
+# COMMAND ----------
+
+# coalesce(1) means it will create only 1 partition, hence only  1 file will be generated.
+# not good, as it will not be able to process in parallel
+# bad for performance and for big data
+df2.coalesce(1) \
+   .write \
+   .option("header", True) \
+   .mode("overwrite") \
+   .csv("/Volumes/pyspark_python/pyspark/ext_vol/Output/Customers_data")
 
 
 # COMMAND ----------
@@ -135,11 +147,12 @@ df = (
 )
 
 # display(df)
-# df.printSchema()
+df.printSchema()
 
 # COMMAND ----------
 
 display(df)
+# in bronze layer the data is kept like this only , when moved to dilver, separae columns  are created by withColumn
 
 # COMMAND ----------
 
@@ -188,7 +201,9 @@ display(df3)
 
 # COMMAND ----------
 
-print(df_csv.columns)
+print(df_csv.columns) # prints column name in list
+col_name = df_csv.columns  # this can used now further
+print(col_name)
 display(df_csv)
 df_csv.printSchema()
 
@@ -200,6 +215,10 @@ df_csv.printSchema()
 # COMMAND ----------
 
 # add a new column or change values of column or datatype of column
+# withcolumn does 3 things
+#   1. If column doesnt exist, it will add a new column
+#   2. If column exist, it will change the value of column
+#   3. If column exist, it will change the datatype of column
 
 from pyspark.sql.functions import col, lit
 #col() → used to refer to a DataFrame column
@@ -233,7 +252,7 @@ display(df_csv)
 # writes to delta table in databricks from DF 
 # column name shouldnt contain space  , ; { } ( ) \n \t = -  or else it will give error
 # Delta tables require SQL-safe column names
-# ✔ lowercase
+# ✔ lowercase 
 # ✔ underscores
 # ✔ no spaces
 # ✔ no special characters
@@ -243,6 +262,7 @@ df_csv.write.saveAsTable("csv_table")
 # COMMAND ----------
 
 # as above df was hvaing space in column name so we are renaming the column
+# df = df.withColumnRenamed("old_column_name", "new_column_name")
 df_clean = (
     df_csv
     .withColumnRenamed("Index", "index_id")
@@ -263,7 +283,7 @@ df_clean = (
 # COMMAND ----------
 
 # writes the DF to delta table
-df_clean.write.saveAsTable("csv_table")
+df_clean.write.mode("overwrite").saveAsTable("csv_table")
 
 
 # COMMAND ----------
@@ -277,7 +297,7 @@ spark.sql("select * from csv_table").display()
 # MAGIC
 # MAGIC Used to define schema manually , nested struct, array & map column
 # MAGIC
-# MAGIC StructType is collection of structField
+# MAGIC StructType is collection of structField. Struct means a column contains multiple fields, or row inside row 
 # MAGIC
 # MAGIC Import this before use
 # MAGIC
@@ -307,12 +327,20 @@ from pyspark.sql.types import *
 
 schema = StructType([
     StructField("id", IntegerType(), True),
-    StructField("Salary", ArrayType(IntegerType()), True)
+    StructField("Salary", ArrayType(IntegerType()), True), # array type column
+    StructField ("Skills", StringType(), True),
+    StructField("Name", StringType(), True),
 ])
-data = [(1, [100000, 200000 , 300000])]
+data = [(1, [100000, 200000 , 300000], "Python", "Amit"), (2, [400000, 500000 , 600000], "java", "Rohit")]
 
 df = spark.createDataFrame(data, schema)
 df.show()
+
+# COMMAND ----------
+
+from pyspark.sql.functions import col
+df.select(col("id"),col("Salary").getItem(0)).show()  
+# select only 1st element from array column and required column. getItem() is used in spark select to fetch item
 
 # COMMAND ----------
 
@@ -320,25 +348,21 @@ from  pyspark.sql.functions import *
 #col() ONLY references existing columns
 
 #df1 = df.withColumn("Salary", col("Salary")[0]).display() 
-df1 = df.withColumn("Salary", col("Salary")[0])          # fetching value from that array column
+df1 = df.withColumn("Salary", col("Salary")[0])          # creating new DF with value from that array column, here salary is not array type
 display(df1)
 
 # COMMAND ----------
 
 # creates a new column of array type and assign value
-df3 = df.withColumn(
-    "number",
-    array(lit(10), lit(20)))
+df3 = df.withColumn("number",array(lit(10), lit(20)))
 display(df3)
 
 # COMMAND ----------
 
 from pyspark.sql.functions import array, lit, col
 
-df4 = df.withColumn(
-    "number",
-    array(col("id"), lit(5000))
-)
+df4 = df3.withColumn( "number_id", array(col("id"), lit(5000)) # in array column we can use existing column value
+
 
 display(df4)
 
@@ -347,16 +371,23 @@ display(df4)
 
 from pyspark.sql.functions import *
 
-df5 = df4.withColumn("new_column",explode(col("number")))    # creates new rows for each element in array and store them in new column
+df5 = df4.withColumn("new_column",explode(col("Salary")))    # creates new rows for each element in array and store them in new column
 
 display(df5)
 
 # COMMAND ----------
 
-df4 = df.withColumn("Skills",(lit("Python, Scala, Java"))) \
-         .withColumn("primary", split(col("Skills"), ",").getItem(0)) \
-         .withColumn("secondary", split(col("Skills"), ",").getItem(1))
-display(df4)
+df5 =( df4.withColumn("new_column",explode(col("Salary"))) 
+          .withColumn("new_number",explode(col("number"))) )  # multiple explode 
+display(df5)
+
+# COMMAND ----------
+
+df6 = (df4.withColumn("Coding",(lit("Python, Scala, Java"))) 
+        .withColumn("primary", split(col("Coding"), ",").getItem(0))      # split is used to split the string with delimeter and get item
+        .withColumn("secondary", split(col("Coding"), ",").getItem(1))
+ )
+display(df6)
 
 # COMMAND ----------
 
@@ -364,24 +395,24 @@ display(df4)
 # only works on strings and not integer
 from pyspark.sql.functions import concat_ws, split, col
 
-df6 = df4.withColumn("Skills_array",split( col("Skills"),","))
-display(df6)
+df7 = df6.withColumn("Skills_array",split( col("Coding"),","))
+display(df7)
 
 # COMMAND ----------
 
-# array used to create a new column of array type from exissting columns of string type
-df6 = df4.withColumn("Skills_array", array(col("primary"), col("secondary")))
-display(df6)
+# array used to create a new column of array type from existing columns of string type
+df8 = df7.withColumn("Skills_learned", array(col("primary"), col("secondary")))
+display(df8)
 
 # COMMAND ----------
 
 # array_contains() used to check if array column has that value
 # if yes then true, if no then false, if array is null it will be null
 from pyspark.sql.functions import array_contains
-df7 = df6.withColumn("Has_skill", array_contains(col("Skills_array"), "Python"))
-df8 = df6.withColumn("Has_skill", array_contains(col("Skills_array"), "ADF"))
-display(df7)
-display(df8)
+df9 = df8.withColumn("Has_skill", array_contains(col("Skills_learned"), "Python"))
+df10 = df8.withColumn("Has_skill", array_contains(col("Skills_learned"), "ADF"))
+display(df9)
+display(df10)
 
 # COMMAND ----------
 
@@ -407,8 +438,8 @@ display(df1)
 
 from pyspark.sql.functions import *
 df2 = df.select("id","Salary",explode(df.Salary)) # explode() is used to create new rows for each element in array and store them in new column
-df3 = df.withColumn("keys", map_keys(df.Salary)) #map_keys is used to get all keys from map column
-df4 = df.withColumn("Values", map_values(df.Salary)) #map_values is used to get all values from map column
+df3 = df.withColumn("keys", map_keys(df.Salary)) #map_keys is used to get all keys from map column and creates a araay column
+df4 = df.withColumn("Values", map_values(df.Salary)) #map_values is used to get all values from map column and creates a araay column
 
 display(df2)
 display(df3)
@@ -430,10 +461,21 @@ print(r1.name + "," + str(r1.age))
 
 # COMMAND ----------
 
+display(df4)
+
+# Now new_row matches the schema (4 columns)
+new_row = (3, {"ADF":80, "PySpark":90}, [10,20,30])
+df = df4.union(spark.createDataFrame([new_row], df4.schema))
+display(df)
+
+# if a new row needs to be added to DF , create the row, then create a new DF, then union it with exisitng DF
+
+# COMMAND ----------
+
 Person = Row("name", "age")
 p1 = Person("James", 40)
 p2 = Person("Alice", 35)
-print(p1.name)  # same like class and object
+print(p1.name)  # same like class and object, created 2 rows and then accessed
 
 
 # COMMAND ----------
@@ -445,7 +487,7 @@ from pyspark.sql.functions import *
 col1 = lit("AMit")
 
 df = spark.createDataFrame([("James", 40), ("Alice", 35)], ["name", "age"])
-df1 = df.withColumn("newcol", lit("value"))
+df1 = df.withColumn("newcol", lit("Amit"))
 display(df1)
 df.select(df.name).show()
 
@@ -458,7 +500,7 @@ df.select(df.name).show()
 
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-data = [("James", 40, "Male"), ("Alice", 35, "Female"), ("Bob", 50, "Male"), ("Charlie", 30, "Female"), ("David", 35, "Male"), ("Esther", 40, "Female"), ("Fiona", 45, "Female")]
+data = [("James", 40, "Male"), ("Alice", 35, "Female"), ("Bob", 50, "Male"), ("Charlie", 30, "Female"), ("David", 35, "Male"), ("Esther", 40, None), ("Fiona", 45, "Female"), ("Charlie", 30, "Female"), ("Charlie", 35, "Female")]
 
 Schema = StructType([StructField("name", StringType(), True), StructField("age", IntegerType(), True), StructField("gender", StringType(), True)])
 
@@ -487,14 +529,14 @@ df.select(df.name.like("A%")).show()
 
 # filter and where , both works same
 df.filter(df.age > 30).show()
-df.where((df.name.like("%A%")) & (df.age > 30)).show()
+df.where((df.name.like("%C%")) & (df.age > 25)).show()
 
 
 # COMMAND ----------
 
 # Distinct and dropDuplicates
 df.distinct().show()
-df.dropDuplicates().show()
+df.dropDuplicates().show()  # if full row is identical , it will delete the duplicate
 
 # COMMAND ----------
 
@@ -512,7 +554,7 @@ display(df2)
 
 df2= df.select(df.name,df.age)
 display(df2)
-df3 = df2.unionByName(df, allowMissingColumns=True)
+df3 = df2.unionByName(df, allowMissingColumns=True)  # allowMissingColumns=True is used to add extra columns with null values
 display(df3)
 
 # COMMAND ----------
@@ -525,9 +567,12 @@ display(df4)
 
 #group by and agg  -- used to calulate more han 1 aggregrate at a time
 from pyspark.sql.functions import *
-df5 = df.groupBy(df.gender).agg(sum(df.age).alias("sum_age"), \
-    avg(df.age).alias("avg_age"), \
-    count(df.age).alias("count_age"))
+df5 = df.groupBy(df.gender)  \
+        .agg(
+         sum(df.age).alias("sum_age"), \
+         avg(df.age).alias("avg_age"), \
+         count(df.age).alias("count_age")
+         )
 display(df5)
 
 
@@ -754,7 +799,12 @@ df2.write.parquet("/Volumes/pyspark_python/pyspark/ext_vol/Output/partition", mo
 # for each country a sseprate folder will be created
 #  when you read data from specific country folder only that data will be read
 
-#  how to combine data now into a single df/table?
+
+
+# COMMAND ----------
+
+df_all = spark.read.parquet("/Volumes/pyspark_python/pyspark/ext_vol/Output/partition")  # reads from all partitions
+display(df_all)
 
 # COMMAND ----------
 
