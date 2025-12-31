@@ -614,3 +614,25 @@ sorted(d.items())
 
 sorted_by_keys = dict(sorted(d.items()))
 print(sorted_by_keys)
+
+# COMMAND ----------
+
+list1 = [[1,2],[3,4],[5,6]]
+
+# COMMAND ----------
+
+for i,j in list1:
+    print(i)
+
+# COMMAND ----------
+
+d = {'k1':1,'k2':2,'k3':3}
+
+# COMMAND ----------
+
+for i in d:
+    print(i)
+
+# COMMAND ----------
+
+sorted(d.items())
