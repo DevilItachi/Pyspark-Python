@@ -521,3 +521,96 @@ except ValueError as e:
 my_list = ["a","b","c","d"]
 for i in enumerate(my_list):
     print(i)
+
+# COMMAND ----------
+
+list1 = [1,1,2,2,3,4,5,6,1,1]
+
+# COMMAND ----------
+
+set1 = set(list1)
+
+# COMMAND ----------
+
+list1 = list(set1)
+list1
+
+# COMMAND ----------
+
+a = 5
+print(a)
+
+# COMMAND ----------
+
+a = "amit"
+b= f"hello {a}"
+print(b)
+c = f'hello "{a}"'
+print(c)
+
+# COMMAND ----------
+
+# MAGIC %%writefile amit_text.txt
+# MAGIC "this is amit"
+
+# COMMAND ----------
+
+my_file = open("amit_text.txt")
+
+# COMMAND ----------
+
+my_file.read()
+
+# COMMAND ----------
+
+my_file.seek(3)
+
+# COMMAND ----------
+
+my_file = open("amit_text.txt", "w+")
+
+# COMMAND ----------
+
+my_file.write("This is 2nd line")
+
+# COMMAND ----------
+
+my_file.seek(0)
+
+# COMMAND ----------
+
+print(my_file.read())
+
+# COMMAND ----------
+
+list1 = my_file.readlines()
+
+# COMMAND ----------
+
+list1
+
+# COMMAND ----------
+
+my_file.close()
+
+# COMMAND ----------
+
+my_file = open("amit_text.txt", "a+")
+my_file.write("This is 3rd line")
+my_file.seek(0)
+
+# COMMAND ----------
+
+print(my_file.readlines())
+
+# COMMAND ----------
+
+d = {"b": 2, "a": 1, "c": 3}
+
+sorted(d.items())
+
+
+# COMMAND ----------
+
+sorted_by_keys = dict(sorted(d.items()))
+print(sorted_by_keys)
