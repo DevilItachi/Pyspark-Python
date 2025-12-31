@@ -31,14 +31,24 @@ print('Hi 'amit', how are you')
 # COMMAND ----------
 
 #using single quote under double and triple single  quote
+
 print("Hi 'amit', how are you")
 print ('''Hi 'amit', how are you''')
+
+# COMMAND ----------
+
+# use single quotes, when your string has double quotes in it
+print('Hi "Amit" how are you')
 
 # COMMAND ----------
 
 # if code is to long to write in single line use \ to write in next line
 print("Hi 'amit', \
       how are you")
+
+# COMMAND ----------
+
+print("c:\\amit\\downloads")
 
 # COMMAND ----------
 
@@ -121,6 +131,12 @@ print(Y)  # 25
 a = 10
 b = 10.5
 print(a+b) # python itseld change 10 to to 10.0 and then add .
+
+# COMMAND ----------
+
+a= "amit"
+b= a*10
+print(b)
 
 # COMMAND ----------
 
