@@ -636,3 +636,35 @@ for i in d:
 # COMMAND ----------
 
 sorted(d.items())
+
+# COMMAND ----------
+
+for i,j in [('This is a string.'),('This is another string.')]:
+    print(i)
+
+
+# COMMAND ----------
+
+for i, j in [
+    ('This is a string.', 'This is another string.')
+]:
+    print(i)
+
+# COMMAND ----------
+
+# Notice the tuple unpacking!
+
+for i,letter in enumerate('abcde'):
+    print(f"At index {i} the letter is {letter}")
+
+# COMMAND ----------
+
+mylist1 = [1,2,3,4,5]
+mylist2 = ['a','b','c','d','e']
+mylist3 = [100,200,300,400,500]
+list(zip(mylist1,mylist2,mylist3))
+
+# COMMAND ----------
+
+mylist = [x for x in range(0,11)]
+mylist
