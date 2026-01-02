@@ -145,7 +145,7 @@ Moudle 3 Methods and Functions
                     # Notice the indentation here
                     return (employee_of_month,current_max)
                 emp_name = employee_check(work_hours)  # calling a function with parameters
-    - Functions often use results from other functions
+    - Functions often use results from other functions.
 
                
     
