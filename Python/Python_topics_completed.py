@@ -130,6 +130,7 @@ Moudle 3 Methods and Functions
     - return allows a function to return a result that can then be stored as a variable, or used in whatever manner a user wants.
     - Return breaks and exits the function.
     - The return keyword allows you to actually save the result of the output of a function as a variable. The print() function simply displays the output to you, but doesn't save it for future use
+    - Tuple unpacking through function
                 def employee_check(work_hours):
                     # Set some max value to intially beat, like zero hours
                     current_max = 0
@@ -146,6 +147,7 @@ Moudle 3 Methods and Functions
                     return (employee_of_month,current_max)
                 emp_name = employee_check(work_hours)  # calling a function with parameters
     - Functions often use results from other functions.
+
 
                
     
