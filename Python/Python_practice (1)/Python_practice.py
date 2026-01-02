@@ -1,4 +1,75 @@
 # Databricks notebook source
+def addnum(n,m):
+    return n+m
+
+# COMMAND ----------
+
+result = addnum(2,3)
+
+# COMMAND ----------
+
+result
+
+# COMMAND ----------
+
+st = 'Print only the words that start with s in this sentence'
+
+# COMMAND ----------
+
+for word in st.split():
+    if word.startswith('s'):
+        print(word)
+
+
+# COMMAND ----------
+
+list1 = [x for x in range(0,51) if x%3 == 0]
+list1
+
+# COMMAND ----------
+
+st = 'Print every word in this sentence that has an even number of letters'
+
+for length in st.split():
+    if len(length)%2 ==0:
+        print("even")
+
+# COMMAND ----------
+
+for num in range(1,101):
+    if (num%3==0) & (num%5==0):
+        print("FizzBuzz")
+    elif num%3==0:
+        print("Fizz")
+    elif num%5==0:
+        print("Buzz")
+    else:
+        print(num)
+
+# COMMAND ----------
+
+st = 'Create a list of the first letters of every word in this string'
+list1 = [x[0] for x in st.split() ]
+list1
+
+# COMMAND ----------
+
+celsius = [0,10,20.1,34.5]
+farenheit = []
+for temp in celsius:
+  fahrenheit = (temp * 9 / 5) + 32
+  farenheit.append(fahrenheit)
+farenheit
+  
+
+# COMMAND ----------
+
+celsius = [0,10,20.1,34.5]
+farenheit = [(temp * 9 / 5) + 32 for temp in celsius]
+farenheit
+
+# COMMAND ----------
+
 # doubel quotes will work , mostly preffered
 print("Hello")
 print(11)

@@ -7,19 +7,21 @@ Module-1  Basics
     - dont use l,o,I as variable names as this are confusing
 3. Strings
     - single, double , triple quotes to write strings. Double mostly preffered.
-    - String indexing , slicing , concate(+) , String functions called Methods(var.upper(), .split(), etc.)
+    - String indexing , slicing , concate(+) 
     - f Strings {} = inserts strings in strings 
+    - String functions called Methods var.upper(), var.split(),  var.startswith() , var.endswith()
 4. Lists
     - can store different datatype []
     - Lists are mutable
     - List indexing , slicing , concate(+) , List methods , nested list
     - List comprehension - creates a NEW list by looping over an iterable and collecting value
+    - .append() , .extend() , .insert() , .remove() , .pop() , .clear() , .index() , .count() , .sort() , .reverse()
 5. Dictionaries
     - key value pairs {}
     - can store different datatype 
     - Dictionaries are mutable
     - Dictionary indexing , slicing , concate(+) , Methods , nested Dictionary
-    - .keys(), .values() , .items() , sorted(d.values())
+    - .keys(), .values() , .items() , sorted(d.values()) , .get() 
 6. Tuples
     - immutable , but similar to List ()
     - If want to modify tuple, convert to list perform operation, convert back to tuple
@@ -55,7 +57,7 @@ Module-2 Python statements
     - for loop , apply on list, tuple , dictionary. It just iterates through all the elements given
                 for item in list:
                     statement
-                --------------------------------------------------------------
+                
                 for itme in list:
                     stament
                     break
@@ -70,16 +72,25 @@ Module-2 Python statements
     - break: Breaks out of the current closest enclosing loop.
     - continue: Goes to the top of the closest enclosing loop.
     - pass: Does nothing at all.
-                while x < 10:
-                    print('x is currently: ',x)
-                    print(' x is still less than 10, adding 1 to x')
-                    x+=1
-                    if x==3:
-                        print('Breaking because x==3')
-                        break
-                    else:
-                        print('continuing...')
-                        continue
+                    while x < 10:
+                        print("x is currently:", x)
+                        print("x is still less than 10, adding 1 to x")
+                        x += 1
+                        # Do nothing when x == 1 (placeholder)
+                        if x == 1:
+                            pass
+                        # Skip iteration when x == 2
+                        elif x == 2:
+                            print("Continuing because x == 2")
+                            continue
+                        # Stop loop when x == 3
+                        elif x == 3:
+                            print("Breaking because x == 3")
+                            break
+                        print("End of loop iteration")
+                    return "Loop finished"
+                
+                
 11. Useful operators
     - range(start,end,step) - returns a sequence of numbers, starting from 0 by default, and increments by 1 (by default), and stops before a specified number.
     - enumerate - enumerate() walks through a list and gives you two things at the same time:
@@ -106,7 +117,38 @@ Module-2 Python statements
 
 12. List Comphrension
     - allow us to build out lists using a different notation. You can think of it as essentially a one line for loop built inside of brackets
-                mylist = [x for x in range(0,11)]
+                - mylist = [x for x in range(0,11)]
+                - lst = [x for x in range(11) if x % 2 == 0]
+                - lst = [ x**2 for x in [x**2 for x in range(11)]] # nested list comphrension can also be done
+
+Moudle 3 Methods and Functions
+13. List Methods
+                - .append() , .extend() , .insert() , .remove() , .pop() , .clear() , .index() , .count() , .sort() , .reverse()
+13. Functions
+    - a set of statements so they can be run more than once. also let us specify parameters that can serve as inputs to the functions.
+    - not have to repeatedly write the same code again and again.
+    - return allows a function to return a result that can then be stored as a variable, or used in whatever manner a user wants.
+    - Return breaks and exits the function.
+    - The return keyword allows you to actually save the result of the output of a function as a variable. The print() function simply displays the output to you, but doesn't save it for future use
+                def employee_check(work_hours):
+                    # Set some max value to intially beat, like zero hours
+                    current_max = 0
+                    # Set some empty value before the loop
+                    employee_of_month = ''
+                    
+                    for employee,hours in work_hours:
+                        if hours > current_max:
+                            current_max = hours
+                            employee_of_month = employee
+                        else:
+                            pass
+                    # Notice the indentation here
+                    return (employee_of_month,current_max)
+                emp_name = employee_check(work_hours)  # calling a function with parameters
+    - Functions often use results from other functions
+
+               
+    
                 
 
    
