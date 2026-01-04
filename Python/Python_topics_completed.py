@@ -1,45 +1,54 @@
 Module-1  Basics
 1. Numbers
-    Integers = 2,-3
-    Floating = 2.5 , 4E2(4x10^2)
+     - Integers = 2,-3
+     - Floating = 2.5 , 4E2(4x10^2)
 
 2. Variable assignments
-    - dont use l,o,I as variable names as this are confusing
+     - dont use l,o,I as variable names as this are confusing
 3. Strings
-    - single, double , triple quotes to write strings. Double mostly preffered.
-    - String indexing , slicing , concate(+) 
-    - f Strings {} = inserts strings in strings 
-    - String functions called Methods var.upper(), var.split(),  var.startswith() , var.endswith()
+     - single, double , triple quotes to write strings. Double mostly preffered.
+     - want to write codes in next line then use triple single/double codes or you can use  \ at the end of line
+     - want \ in text use it 2 times \\
+     - # is used for comment
+     - use single quotes, when your string has double quotes in it, and vice versa
+     - String indexing , slicing , concate(+) 
+     - f Strings {} = inserts strings in strings 
+     - String functions called Methods var.upper(), var.split(),  var.startswith() , var.endswith() 
+     - isupper() , islower() , isnumeric() , isalpha() , isalnum()
+     - Indendation 4 spaces per indendation
 4. Lists
-    - can store different datatype []
-    - Lists are mutable
-    - List indexing , slicing , concate(+) , List methods , nested list
-    - List comprehension - creates a NEW list by looping over an iterable and collecting value
-    - .append() , .extend() , .insert() , .remove() , .pop() , .clear() , .index() , .count() , .sort() , .reverse()
+     - can store different datatype []
+     - Lists are mutable
+     - List indexing , slicing , concate(+) , List methods , nested list
+     - List comprehension - creates a NEW list by looping over an iterable and collecting value
+     - .append() , .extend() , .insert() , .remove() , .pop() , .clear() , .index() , .count() , .sort() , .reverse()
+     - " ".join(list) # used to join list of strings into a single string
 5. Dictionaries
-    - key value pairs {}
-    - can store different datatype 
-    - Dictionaries are mutable
-    - Dictionary indexing , slicing , concate(+) , Methods , nested Dictionary
-    - .keys(), .values() , .items() , sorted(d.values()) , .get() 
+     - key value pairs {}
+     - can store different datatype 
+     - Dictionaries are mutable
+     - Dictionary indexing , slicing , concate(+) , Methods , nested Dictionary
+     - .keys(), .values() , .items() , sorted(d.values()) , .get() 
 6. Tuples
-    - immutable , but similar to List ()
-    - If want to modify tuple, convert to list perform operation, convert back to tuple
+     - immutable , but similar to List ()
+     - If want to modify tuple, convert to list perform operation, convert back to tuple
 7. Sets and booleans
-    - Sets are an unordered collection of unique elements () . The result of set is in {}
-    - List can be converted to set, which will not have duplicates, and again converted back to list
-    - Booleans (with predefined True and False displays that are basically just the integers 1 and 0). It also has a placeholder object called None.
+     - Sets are an unordered collection of unique elements () . The result of set is in {}
+     - List can be converted to set, which will not have duplicates, and again converted back to list
+     - union, intersection, difference, issubset, issuperset, etc can be applied on sets.
+     - Booleans (with predefined True and False displays that are basically just the integers 1 and 0). It also has a placeholder object called None.
 8. Comparison operators
-    - output a Boolean value (True or False).
-    - == , != , > , <,  >= ,  <=
-    - And , Or 
+     - output a Boolean value (True or False).
+     - == , != , > , <,  >= ,  <=
+     - And , Or 
+     - abs()
 9. Files
-    - Python uses file objects to interact with external files on your computer
-    - need to install certain libraries or modules to interact with those various file types
-    - create file (%%write text.txt), current directory (pwd) , open() , read(), seek(0), readlines() , close(), 
-    - write to file open(text.txt , w+)  write()  -- this is truncate and write
-    - append to file open(text.txt , a+)  write() -- appends the file
-    - Iterating through a file
+     - Python uses file objects to interact with external files on your computer
+     - need to install certain libraries or modules to interact with those various file types
+     - create file (%%write text.txt), current directory (pwd) , open() , read(), seek(0), readlines() , close(), 
+     - write to file open(text.txt , w+)  write()  -- this is truncate and write
+     - append to file open(text.txt , a+)  write() -- appends the file
+     - Iterating through a file
 
 
 
@@ -147,8 +156,54 @@ Moudle 3 Methods and Functions
                     return (employee_of_month,current_max)
                 emp_name = employee_check(work_hours)  # calling a function with parameters
     - Functions often use results from other functions.
+    - Functions can be nested as well
+14. Map Function
+     - a loop that applies the same operation to every item in an iterable. takes 1 element at a time and applies function to it
+     - It does not execute immediately. It processes items one by one (lazy evaluation)
+     - list(map(function, iterable))  # basic syntax for map list
+     - list(map(splicer,mynames))
+15. filter function
+     - you need to filter by a function that returns either True or False
+     - filter function returns an iterator yielding those items of iterable for which function(item) is true
+     - list(filter(function, iterable)) # basic syntax for filter list
+     - list(filter(check_even,nums))
+16. Lambda Expression
+     - lambda expressions allow us to create "anonymous" functions. basically means we can quickly make ad-hoc functions without needing to properly define a function using def
+     - lambda's body is a single expression, not a block of statements.
+     - lambda arguments: expression    # basic syntax 
+     - list(map(lambda num: num ** 2, my_nums))
+     - not every function can be translated into a lambda expression.
+17. Variable Scope
+    - LEGB Rule
+         - L: Local - Names assigned in any way within a function (def or lambda)
+         - E: Enclosing function locals - Names in the local scope of any and all enclosing functions (def or lambda) from inner to outer
+         - G: Global (module) - Names assigned at the top-level of a module file , or declared global in a def within the file
+         - B: Built-in (Python) - Names preassigned in the built-in names module : open,range,SyntaxError -
+     -  use the globals() and locals() functions to check what are your current local and global variables.
+     - inside function if we write global x and assign new value to x, it will change the global x value
+18. *args and **kwargs
+     - *args lets a function accept ANY number of parameters.
+     - args is just a tuple. The * tells Python to Collect all extra parameters and pack them into one tuple
+     - its not necessary we have to use args word, we can use any word but start should be *. eg *spam, *abc. 
+                 - def myfunc(*args):
+                     return sum(args)*.05
+19. **kwargs
+     - lets a function accept ANY number of named inputs (key = value) like dictionary
+     - kwargs is just a dictionary. The ** tells Python to Collect all extra parameters and pack them into one dictionary
+     - its not necessary we have to use kwargs word, we can use any word but start should be **. eg **spam
+     - You can pass *args and **kwargs into the same function, but *args have to appear before **kwargs
+                - def myfunc(*args, **kwargs):
+                     if 'fruit' and 'juice' in kwargs:
+                        print(f"I like {' and '.join(args)} and my favorite fruit is {kwargs['fruit']}")
+                        print(f"May I have some {kwargs['juice']} juice?")
+                     else:
+                        pass
+                    
+                  myfunc('eggs','spam',fruit='cherries',juice='orange')
+Palindrome - A palindrome is word, phrase, or sequence that reads the same backward as forward, e.g., madam,kayak,racecar, or a phrase "nurses run"
 
-
+                 
+                
                
     
                 
