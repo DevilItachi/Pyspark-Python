@@ -121,7 +121,7 @@ Module-2 Python statements
     - random - from random import *  
                 - shuffle(mylist)
                 - randint(0,100) # generates 1 randoom int including 0 and 100
-    - input - takes input from the user, cluster keeps running until user enters something
+    - input - takes input from the user,waits (blocks) until the user types something and presses Enter.. By default it will be string.
                 - input('Enter Something into this box: ')
 
 12. List Comphrension
@@ -201,9 +201,43 @@ Moudle 3 Methods and Functions
                     
                   myfunc('eggs','spam',fruit='cherries',juice='orange')
 Palindrome - A palindrome is word, phrase, or sequence that reads the same backward as forward, e.g., madam,kayak,racecar, or a phrase "nurses run"
+Pangrams  - A Pangrams are words or sentences containing every letter of the alphabet at least once.
 
-                 
-                
+20. Object oriented programming (OOPS)
+     - Writing code by treating real-world things as objects so programs become clean, reusable, and easy to manage
+     - OOPS uses 4 main ideas (super simple)
+                1. Class -  Blueprint
+                👉 Like a design of a car
+                2. Object - Real thing
+                👉 The actual car made from the design
+                3. Encapsulation - Keep things safe
+                👉 Don't allow everyone to touch engine directly
+                4. Inheritance - Reuse
+                👉 Electric car uses features of normal car
+     - type() to check the type of object something is eg print(type([]))
+     - class 
+             - User defined objects are created using the class keyword. The class is a blueprint that defines the nature of a future object.
+             - From classes we can construct instances. An instance is a specific object created from a particular class.
+                     - # Create a new object type called Sample
+                     class Sample:
+                         pass 
+                     # Instance of Sample
+                     x = Sample() 
+                     print(type(x))
+             - we give classes a name that starts with a capital letter.
+     - Attribute
+             - An attribute is a characteristic of an object. A method is an operation we can perform with the object.
+             - syntax for creating an attribute is: self.attribute = something
+             - There is a special method called: __init__()  used to initialize the attributes of an object
+                     class Dog:
+                        def __init__(self,breed):       # this breed is used below after equal, both should be same as both are same variable
+                            self.breed = breed
+                     sam = Dog(breed='Lab')
+                     frank = Dog(breed='Huskie')
+             -__init__ is a setup function. It runs automatically when you create an object. Think of it as “object birth process"
+             - The special method __init__() is called automatically right after the object has been created.
+     
+            
                
     
                 
