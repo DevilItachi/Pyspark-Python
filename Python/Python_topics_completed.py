@@ -102,7 +102,8 @@ Module-2 Python statements
                 
 11. Useful operators
     - range(start,end,step) - returns a sequence of numbers, starting from 0 by default, and increments by 1 (by default), and stops before a specified number.
-    - enumerate - enumerate() walks through a list and gives you two things at the same time:
+    - enumerate - Enumerate allows you to keep a count as you iterate through an object. It does this by returning a tuple in the form (count,element)
+                enumerate() walks through a list and gives you two things at the same time:
                 1. Position number (count)
                 2. Actual item
                 It starts with 0 by default
@@ -167,6 +168,11 @@ Moudle 3 Methods and Functions
      - filter function returns an iterator yielding those items of iterable for which function(item) is true
      - list(filter(function, iterable)) # basic syntax for filter list
      - list(filter(check_even,nums))
+16. Reduce function
+     - The function reduce(function, sequence) continually applies the function to the sequence. It then returns a single value.
+     - First it will 2 take iterable, solve it and get 1 value, then it will take that value and the next value in the iterable and solve it and get the next value, and so on until it is done with the iterable.
+     - reduce(lambda x,y: x+y,lst)
+     - reduce(function, iterable)
 16. Lambda Expression
      - lambda expressions allow us to create "anonymous" functions. basically means we can quickly make ad-hoc functions without needing to properly define a function using def
      - lambda's body is a single expression, not a block of statements.
@@ -230,14 +236,85 @@ Pangrams  - A Pangrams are words or sentences containing every letter of the alp
              - syntax for creating an attribute is: self.attribute = something
              - There is a special method called: __init__()  used to initialize the attributes of an object
                      class Dog:
-                        def __init__(self,breed):       # this breed is used below after equal, both should be same as both are same variable
+                        def __init__(self,breed):     #This is METHOD.  this breed is used below after equal, both should be same as both are same variable
                             self.breed = breed
                      sam = Dog(breed='Lab')
                      frank = Dog(breed='Huskie')
              -__init__ is a setup function. It runs automatically when you create an object. Think of it as “object birth process"
              - The special method __init__() is called automatically right after the object has been created.
-     
-            
+     - Class object attributes
+             - These Class Object Attributes are the same for any instance of the class.
+             - Class Object Attribute is defined outside of any methods in the class
+                     class Dog:
+                     # Class Object Attribute
+                     species = 'mammal'
+                     def __init__(self,breed,name):
+                        self.breed = breed
+                        self.name = name
+     - Methods 
+             - Methods are functions defined inside the body of a class
+             - They are used to perform operations with the attributes of our objects.
+     - Inheritance
+             - Inheritance is a way to form new classes using classes that have already been defined. The newly formed classes are called derived classes, the classes that we derive from are called base classes.
+             - Important benefits of inheritance are code reuse and reduction of complexity of a program. The derived classes (descendants) override or extend the functionality of base classes.
+     - Polymorphism
+             - polymorphism refers to the way in which different object classes can share the same method name, and those methods can be called from the same place even though a variety of different objects might be passed in.
+     -  abstract classes
+             - An abstract class is one that never expects to be instantiated.
+     - special methods
+             - __init__(), __str__(), __len__() and __del__() methods
+             - They allow us to use Python specific functions on objects created through our class
+
+21. Modules
+     - Modules in Python are simply Python files with the .py extension, which implement a set of functions
+     - Modules are imported from other modules 
+     - import math
+     - Two very important functions come in handy when exploring modules in Python - the dir and help functions
+22. Packages
+     - Packages are name-spaces which contain multiple packages and modules themselves
+     - Library
+        └── Package
+            └── Module
+                └── Class
+                        └── Method / Function
+
+23. Errors and Exception Handling
+     -  to handle errors in Python we have try and except statements.
+                     -  try:
+                        You do your operations here...
+                        ...
+                        except ExceptionI:
+                        If there is ExceptionI, then execute this block.
+                        except ExceptionII:
+                        If there is ExceptionII, then execute this block.
+                        ...
+                        else:
+                        If there is no exception then execute this block.
+     - We can also just check for any exception with just using except:
+     - try executes main block, if it fails, it goes to except block
+     - finally The finally: block of code will always be run regardless if there was an exception in the try code block.
+                     - def askint():
+                        while True:
+                            try:
+                                val = int(input("Please enter an integer: "))
+                            except:
+                                print("Looks like you did not enter an integer!")
+                                continue
+                            else:
+                                print("Yep that's an integer!")
+                                print(val)
+                                break
+                            finally:
+                                print("Finally, I executed!")
+24. Unit Testing
+     - Equally important as writing good code is writing good tests. Better to find bugs yourself than have them reported to you by end users!
+     - These are simple tools that merely look at your code, and they'll tell you if there are style issues or simple problems like variable names being called before assignment.
+     - pylint
+             - pylint tests for style as well as some very basic program logic. you should install pylint.
+     - unittest
+             - unittest lets you write your own test programs. The goal is to send a specific set of data to your program, and analyze the returned results against an expected result.
+
+
                
     
                 
