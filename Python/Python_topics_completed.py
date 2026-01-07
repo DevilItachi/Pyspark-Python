@@ -158,6 +158,7 @@ Moudle 3 Methods and Functions
                 emp_name = employee_check(work_hours)  # calling a function with parameters
     - Functions often use results from other functions.
     - Functions can be nested as well
+    - del hello # deletes a function hello
 14. Map Function
      - a loop that applies the same operation to every item in an iterable. takes 1 element at a time and applies function to it
      - It does not execute immediately. It processes items one by one (lazy evaluation)
@@ -314,11 +315,92 @@ Pangrams  - A Pangrams are words or sentences containing every letter of the alp
      - unittest
              - unittest lets you write your own test programs. The goal is to send a specific set of data to your program, and analyze the returned results against an expected result.
 
+26. Decorators
+     - Decorators provide a way to modify functions using other functions.They help to make your code shorter and more "Pythonic".
+     - Remember that in Python everything is an object. That means functions are objects which can be assigned labels and passed into other functions. 
+     - Even though we deleted the name hello, the name greet still points to our original function object. It is important to know that functions are objects that can be passed to other objects. If a function greet is there which is pointing to function hello, and we delete hello still greet will work.
+     - A function which is defined under another function is called a nested function. This nested function cannot be called outside the main function.it can only be called inside that particular function.
+     - when you put a pair of parentheses after it, the function gets executed; whereas if you don’t put parentheses after it, then it can be passed around and can be assigned to other variables without executing it.
+                        def new_decorator(func):
 
-               
+                            def wrap_func():
+                                print("Code would be here, before executing the func")
+
+                                func()
+
+                                print("Code here will execute after the func()")
+
+                            return wrap_func
+                        @new_decorator
+                        def new_fun():
+                            print("This function is in need of a Decorator")
+                        new_fun()
+
+27. Iterators and Generators
+     - Generator functions allow us to write a function that can send back a value and then later resume to pick up where it left off. 
+     - allowing us to generate a sequence of values over time. 
+     -  they don't actually return a value and then exit. Instead, generator functions will automatically suspend and resume their execution and state around the last point of value generation
+     - The main advantage here is that instead of having to compute an entire series of values up front, the generator computes one value and then suspends its activity awaiting the next instruction. This feature is known as state suspension. 
+     - yield > Pauses function , Produces many values, Function resumes, Generator function
+                         def gencubes(n):
+                            for num in range(n):
+                                yield num**3
+                         for x in gencubes(10):
+                            print(x)
+     - If we use empty list and append it for every loop it will also work, but by doing this all values will be stored in memory. For small data its ok, but for large dataset this will create issue. So Generator and yield are used in those cases.
+     - Next() - next() function allows us to access the next element in a sequence. 
+                         def simple_gen():
+                            for x in range(3):
+                                yield x
+                                 
+                         g = simple_gen()
+                         print(next(g))  # 0
+                         print(next(g))	 # 1
+         - After yielding all the values next() caused a StopIteration error. What this error informs us of is that all the values have been yielded.
+     - Iter() -  a string object supports iteration, but we can not directly iterate over it as we could with a generator function. The iter() function allows us to do just that!. its used for string.
+                         s = 'hello'
+                         s_iter = iter(s)
+                         print(next(s_iter))
+                 
+
+
+28. Advanced Python modules
+     - Counter  - Counter is a dict subclass which helps count hashable objects. Inside of it elements are stored as dictionary keys and the counts of the objects are stored as the value.
+             - from collections import Counter
+             lst = [1,2,2,2,2,3,3,3,1,2,1,12,3,2,32,1,21,1,223,1]
+             Counter(lst)   # Counter({1: 6, 2: 6, 3: 4, 12: 1, 21: 1, 32: 1, 223: 1})
+                sum(c.values())                 # total of all counts
+                c.clear()                       # reset all counts
+                list(c)                         # list unique elements
+                set(c)                          # convert to a set
+                dict(c)                         # convert to a regular dictionary
+                c.items()                       # convert to a list of (elem, cnt) pairs
+                Counter(dict(list_of_pairs))    # convert from a list of (elem, cnt) pairs
+                c.most_common()[:-n-1:-1]       # n least common elements
+                c += Counter()                  # remove zero and negative counts
+     
+29. Opening and Reading Files
+     - pwd -- gives the directory where the notebook is actually stored.
+     - os -- built-in os module that allows us to use operating system dependent functionality
+     - os.getcwd() --  gives the directory where the notebook is actually stored.
+     - os.listdir() -- returns a list containing the names of the entries in the directory given by path
+     - Moving Files  shutil - to move files to different locations. Keep in mind, there are permission restrictions, for example if you are logged in a User A, you
+                     won't be able to make changes to the top level Users folder without the proper permissions
+                             import shutil
+                             shutil.move('practice.txt','\\Users\\Marcial') #moves to marcial folder
+                             shutil.move('\\Users\\Marcial\practice.txt',os.getcwd()) # moves to current directory
+     - Deleting Files - 3 methods for deleting files:
+                     1.os.unlink(path) which deletes a file at the path your provide
+                     2.os.rmdir(path) which deletes a folder (folder must be empty) at the path your provide
+                     3.shutil.rmtree(path) this is the most dangerous, as it will remove all files and folders contained in the path.
+                     All of these methods can not be reversed! Which means if you make a mistake you won't be able to recover the file. Instead we will use the send2trash module. A safer alternative that sends deleted files to the trash bin instead of permanent removal.
+                             pip install send2trash
+                             import send2trash
+                             send2trash.send2trash('practice.txt')
+                    
+30. datetime module
+     -
     
-                
-
    
 
 
