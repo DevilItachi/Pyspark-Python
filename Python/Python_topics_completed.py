@@ -13,6 +13,7 @@ Module-1  Basics
      - use single quotes, when your string has double quotes in it, and vice versa
      - String indexing , slicing , concate(+) 
      - f Strings {} = inserts strings in strings 
+     - raw string r' ' ,r means Python will not treat \ as escape characters , Required for regex patterns
      - String functions called Methods var.upper(), var.split(),  var.startswith() , var.endswith() 
      - isupper() , islower() , isnumeric() , isalpha() , isalnum()
      - Indendation 4 spaces per indendation
@@ -399,9 +400,154 @@ Pangrams  - A Pangrams are words or sentences containing every letter of the alp
                              send2trash.send2trash('practice.txt')
                     
 30. datetime module
-     -
+     - deal with timestamps in your code
+     - Time values are represented with the time class. Times have attributes for hour, minute, second, and microsecond. They can also include time zone information
+                             import datetime
+                             t = datetime.time(4, 20, 1)
+                             print(t)
+                             print('hour  :', t.hour)
+                             print('minute:', t.minute)
+                             print('second:', t.second)
+                             print('microsecond:', t.microsecond)
+                             print('tzinfo:', t.tzinfo)
     
+                             today = datetime.date.today()
+                             print('ctime:', today.ctime())
+                             print('tuple:', today.timetuple())
+                             print('ordinal:', today.toordinal())
+                             print('Year :', today.year)
+                             print('Month:', today.month)
+                             print('Day  :', today.day)
+                             print(today)
+
+                             print('Earliest  :', datetime.time.min)
+                             print('Latest    :', datetime.time.max)
+                             print('Resolution:', datetime.time.resolution)                            
+                             print('Earliest  :', datetime.date.min)
+                             print('Latest    :', datetime.date.max)
+                             print('Resolution:', datetime.date.resolution)
    
+31. Math and Random Modules
+                             import math
+                             math.floor(value)  #4.35 to 4
+                             math.ceil(value)   #4.35 to 5
+                             round(value)  #4.35 to 4 , nearest even value it will roundup, bankers rule
+                             math.pi
+                             math.sin(10)
+
+                             import random
+                             random.randint(0,100) # 1 random number between 0 to 100
+                             mylist = list(range(0,20))  # 0 to 19 
+                             random.choice(mylist)  # random from that list
+                             random.choices(population=mylist,k=10)  # with replacement , same number can be multiple times
+                             random.sample(population=mylist,k=10) # no duplicates
+                             random.shuffle(mylist)
+
+32. Python Debugger
+     - You've probably used a variety of print statements to try to find errors in your code. A better way of doing this is by using Python's built-in debugger module (pdb). 
+     -  It includes features to let you pause your program, look at the values of variables, and watch program execution step-by-step, so you can understand what your program actually does and find bugs in the logic.
+
+33. Regular Expressions
+     - sometimes called regex for short allows a user to search for strings using almost any sort of rule they can come up.
+                             import re
+                             text = "The person's phone number is 408-555-1234. Call soon!"
+                             pattern = 'phone'
+                             match = re.search(pattern,text) # if not found none is returned
+                             match.span()  # gives index positions of the macthes
+                             match.start()
+                             match.end()
+                             matches = re.findall("phone",text)   # find all phone in text multiple values
+                             for match in re.finditer("phone",text):
+                                 print(match.span())  # To get actual match objects, use the iterator:
+     - Patterns
+                             phone = re.search(r'\d\d\d-\d\d\d-\d\d\d\d',text)
+                             patttern to search in the strings
+         Character	Description	    Example Pattern Code	Exammple Match
+            \d	    A digit 	        file_\d\d	            file_25
+            \w	    Alphanumeric	    \w-\w\w\w              	A-b_1
+            \s	    White space     	a\sb\sc	                a b c
+            \D	    A non digit     	\D\D\D	                ABC
+            \W	    Non-alphanumeric    \W\W\W\W\W	            *-+=)
+            \S	    Non-whitespace	    \S\S\S\S	            Yoyo
+
+
+         Character	Description	            Example Pattern Code	Exammple Match
+            +	    Occurs one or more times	Version                 \w-\w+	Version A-b1_1
+            {3}	    Occurs exactly 3 times  	\D{3}	                abc
+            {2,4}	Occurs 2 to 4 times     	\d{2,4}	                123
+            {3,}	Occurs 3 or more	        \w{3,}	                anycharacters
+            \*	    Occurs zero or more times	A\*B\*C*	            AAACC
+            ?	    Once or none	            plurals?	            plural
+
+
+                             re.search(r'\d{3}-\d{3}-\d{4}',text)
+                             phone = re.search(r'\d\d\d-\d\d\d-\d\d\d\d',text)
+                             phone_pattern = re.compile(r'(\d{3})-(\d{3})-(\d{4})') # complie is like formula set for search pattern
+                             results = re.search(phone_pattern,text)
+                             results.group()   # creates a group of all matched values
+                             results.group(1)  # shows 1 value from the group
+                             re.search(r"man|woman","This woman was here.")  # search man or woman in string and give output
+                             re.findall(r'\d$','This ends with a number 2')   # $ is used to find ending with
+                             re.findall(r'^\d','1 is the loneliest number.') # ^ is used to find starting with
+                            
+34. Timing your code
+     - Sometimes it's important to know how long your code is taking to run, or at least know if a particular line of code is slowing down your entire project. Python has a built-in timing module to do this.
+     - We can try using the time module to simply calculate the elapsed time for the code. Keep in mind, due to the time module's precision, the code needs to take at least 0.1 seconds to complete.
+                             # STEP 1: Get start time
+                             start_time = time.time()
+                             # Step 2: Run your code you want to time
+                             result = func_one(1000000)
+                             # Step 3: Calculate total time elapsed
+                             end_time = time.time() - start_time
+     - Timeit Module
+         - What if we have two blocks of code that are quite fast, the difference from the time.time() method may not be enough to tell which is fater. In this case, we can use the timeit module.
+         - The timeit module takes in two strings, a statement (stmt) and a setup. It then runs the setup code and runs the stmt code some n number of times and reports back average length of time it took.
+                             timeit.timeit(stmt2,setup2,number=100000)
+            
+35. Unzipping and Zipping Files
+     - The zipfile library is built in to Python, we can use it to compress folders or files. To compress all files in a folder, just use the os.walk() method to iterate this process for all the files in a directory.
+     - Create Zip file first , then write to it (the write step compresses the files.)
+                             comp_file = zipfile.ZipFile('comp_file.zip','w')
+                              #creates file  
+                             f = open("new_file2.txt",'w+')
+                             f.write("Here is some text")
+                             f.close()
+                             # creates zip file then add other files to it
+                             import zipfile
+                             comp_file = zipfile.ZipFile('comp_file.zip','w')  # created a zip folder
+                             comp_file.write("new_file2.txt",compress_type=zipfile.ZIP_DEFLATED)   # new_file2 is placed in the zip folder
+                             comp_file.close()
+     - Unzipping file
+         - We can easily extract files with either the extractall() method to get all the files, or just using the extract() method to only grab individual files. 
+                             zip_obj = zipfile.ZipFile('comp_file.zip','r')
+                             zip_obj.extractall("extracted_content")  
+                             # single file extraction
+                             zip_obj = zipfile.ZipFile('comp_file.zip', 'r')
+                             zip_obj.extract('data/file1.csv', 'extracted_content')
+                             zip_obj.close()
+     - Often you don't want to extract or archive individual files from a .zip, but instead archive everything at once. The shutil library that is built in
+     - The shutil library can accept a format parameter, format is the archive format: one of "zip", "tar", "gztar", "bztar", or "xztar".
+                             import shutil , os
+                             directory_to_zip = '/Volumes/pyspark_python/pyspark/ext_vol' # this directory all file folders will be zip
+                             output_filename = 'example'  # in current directory the zip will be created
+                             shutil.make_archive(output_filename,'zip',directory_to_zip)
+                             os.path.exists(directory_to_zip)   # checks if we have access to path or not
+
+
+
+
+                             
+
+
+
+
+                            
+
+
+
+                            
+
+
 
 
 
