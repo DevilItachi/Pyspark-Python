@@ -2,6 +2,7 @@ Module-1  Basics
 1. Numbers
      - Integers = 2,-3
      - Floating = 2.5 , 4E2(4x10^2)
+     - abs(), round()
 
 2. Variable assignments
      - dont use l,o,I as variable names as this are confusing
@@ -15,14 +16,14 @@ Module-1  Basics
      - f Strings {} = inserts strings in strings 
      - raw string r' ' ,r means Python will not treat \ as escape characters , Required for regex patterns
      - String functions called Methods var.upper(), var.split(),  var.startswith() , var.endswith() 
-     - isupper() , islower() , isnumeric() , isalpha() , isalnum()
+     - isupper() , islower() , isnumeric() , isalpha() , isalnum() , capitalize() , upper(), lower(), count(), find()
      - Indendation 4 spaces per indendation
 4. Lists
      - can store different datatype []
      - Lists are mutable
      - List indexing , slicing , concate(+) , List methods , nested list
      - List comprehension - creates a NEW list by looping over an iterable and collecting value
-     - .append() , .extend() , .insert() , .remove() , .pop() , .clear() , .index() , .count() , .sort() , .reverse()
+     - .append() , .extend() , .insert() , .remove() , .pop() , .clear() , .index() , .count() , .sort() , .reverse() , copy()
      - " ".join(list) # used to join list of strings into a single string
 5. Dictionaries
      - key value pairs {}
@@ -37,7 +38,8 @@ Module-1  Basics
      - Sets are an unordered collection of unique elements () . The result of set is in {}
      - List can be converted to set, which will not have duplicates, and again converted back to list
      - union, intersection, difference, issubset, issuperset, etc can be applied on sets.
-     - Booleans (with predefined True and False displays that are basically just the integers 1 and 0). It also has a placeholder object called None.
+     - Booleans - with predefined True and False displays that are basically just the integers 1 and 0). It also has a placeholder object called None.
+     - add(1) , clear(), clear() , s.difference(sc) , discard(2) , s1.intersection(s2) , s1.isdisjoint(s2) , 
 8. Comparison operators
      - output a Boolean value (True or False).
      - == , != , > , <,  >= ,  <=
@@ -529,11 +531,55 @@ Pangrams  - A Pangrams are words or sentences containing every letter of the alp
      - The shutil library can accept a format parameter, format is the archive format: one of "zip", "tar", "gztar", "bztar", or "xztar".
                              import shutil , os
                              directory_to_zip = '/Volumes/pyspark_python/pyspark/ext_vol' # this directory all file folders will be zip
-                             output_filename = 'example'  # in current directory the zip will be created
+                             output_filename = 'example'  # in current directory the zip will be created , not avaialble in volume of unity catalog directly
                              shutil.make_archive(output_filename,'zip',directory_to_zip)
                              os.path.exists(directory_to_zip)   # checks if we have access to path or not
+                             # below command is for extracting any compressed folers file, just give extension like zip
+                             shutil.unpack_archive(output_filename,dir_for_extract_result,'zip')
 
+36. Working with CSV
+     - import csv
+     - Encoding - Often csv files may contain characters that you can't interpret with standard python, this could be something like an @ symbol, or even foreign characters
+                             import csv
+                             data = open('example.csv')
+                             data
+                             csv_data = csv.reader(data)
+                             data_lines = list(csv_data)
+                             
+                             data = open('example.csv',encoding="utf-8")
+                             csv_data = csv.reader(data)
+                             data_lines = list(csv_data)
+                             
+                             data_lines[:3]
+                             
+                             all_emails = []
+                             for line in data_lines[1:15]:
+                                 all_emails.append(line[3])                      
+     - Writing to new CSV Files 
+                             file_to_output = open('to_save_file.csv','w',newline='')
+                             csv_writer = csv.writer(file_to_output,delimiter=',')
+                             csv_writer.writerow(['a','b','c'])
+                             csv_writer.writerows([['1','2','3'],['4','5','6']])
+                             file_to_output.close()
+     - Existing File
+                             f = open('to_save_file.csv','a',newline='')
+                             csv_writer = csv.writer(f)
+                             csv_writer.writerow(['new','new','new'])
+                             f.close()
+37. Overview of Sending Emails
+     - The smtplib library allows you to manually go through the steps of creating and sending an email in Python.
+     - Create an SMTP object for a server. Here are the main Server Domain Name for the top email services
+     - Next is to create an STMP object that can make the method calls to log you in to your email in order to send messages. 
+     - Next we run the ehlo() command which "greets" the server and establishes the connection. This method call should be done directly after creating the object. Calling it after other methods may result in errors in connecting later on. The first item in the tuple that is returned should be 250, indicating a successful connection.
+     - When using the 587 port, this means you are using TLS encryption, which you need to initiate by running the starttls() command. If you are using port 465, this means you are using SSL and you can skip this step.
+     - Now its time to set up the email and the passwords. You should never save the raw string of your password or email in a script, because anyone that sees this script will then be able to see you email and password! Instead you should use input() to get that information. If you also don't want your password to be visible when typing it in, you can use the built-in getpass library that will hide your password as you type it in, either with asterisks or by just keeping it invisible.
 
+38. With Statement
+     - When you open a file using f = open('test.txt'), the file stays open until you specifically call f.close(). Should an exception be raised while working with the file, it remains open. This can lead to vulnerabilities in your code, and inefficient use of resources.
+     - Open the file → use it → automatically close it.  Even if an error happens.
+                                 with open("data.csv", "w") as f:
+                                 f.write("id,name\n")
+                                 f.write("1,Alice\n")
 
 
                              
