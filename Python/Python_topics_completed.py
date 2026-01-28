@@ -1,4 +1,3 @@
-Module-1  Basics
 1. Numbers
      - Integers = 2,-3
      - Floating = 2.5 , 4E2(4x10^2)
@@ -55,7 +54,7 @@ Module-1  Basics
 
 
 
-Module-2 Python statements
+
 10. Statements
     - Indentation are important in python, no proper indendation , code will fail
     - if, elif, else , nested if 

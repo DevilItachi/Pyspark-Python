@@ -826,3 +826,18 @@ window_df = df.withColumn(
     row_number().over(window_spec)
 )
 display(window_df)
+
+# COMMAND ----------
+
+spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
+# Enables automatic schema evolution for Delta Lake.
+
+#👉 When writing data to an existing Delta table, Spark will automatically merge new columns into the table schema instead of failing.
+# Default behavior (autoMerge = false)
+
+# COMMAND ----------
+
+spark.conf.set("spark.databricks.delta.rowLevelConcurrencyPreview", "true")
+# Allows multiple writers to update different rows of the same Delta table at the same time, reducing write conflicts.
+# Only conflicting rows fail
+# Non-conflicting updates succeed
