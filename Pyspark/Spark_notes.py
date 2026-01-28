@@ -10,6 +10,7 @@
         - Manages information and state of executors
         - Analyse , distribute and schedule work on executors
         - GIves instrucition to executors
+        - Cluster manager resides in Driver, which is mostly YARN or Kubernetes
 - Executors
         - Execute the actual work
         - Respond the driver with the execution status
