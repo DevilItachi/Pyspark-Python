@@ -66,6 +66,7 @@ display(df_csv)
 
 # COMMAND ----------
 
+# DBTITLE 1,df_from_csv
 # loading multiple csv files which are in same folder use *.csv
 # if files are at different location give all files path 
 # the schema should be same for all csv files
@@ -540,6 +541,21 @@ df.dropDuplicates().show()  # if full row is identical , it will delete the dupl
 
 # COMMAND ----------
 
+df1= df.select("department_id").distinct() # shows only particular column distinct
+
+# COMMAND ----------
+
+# drops column from df
+df11 = df.drop("age") # single col
+df12 = df.drop("age","gender") # multiple col
+
+# COMMAND ----------
+
+# limits the records
+df13 = df.limit(5)
+
+# COMMAND ----------
+
 # union and union all, both are same. Union doesnt remove duplicates like SQL
 df1 = df.filter(df.age > 40)
 display(df)
@@ -547,6 +563,12 @@ display(df1)
 df2 = df.union(df1)
 display(df2)
 
+
+# COMMAND ----------
+
+# union to work
+# schema should be same, order of column should be same , same column number
+# if schema is same, column no. same , but order is diff then use unionbyname
 
 # COMMAND ----------
 
@@ -562,6 +584,12 @@ display(df3)
 # grouup by can do only 1 aggreation at a time, for multiple use agg
 df4 = df.groupBy(df.gender).count()
 display(df4)
+
+# COMMAND ----------
+
+# groupby and having in sql 
+# we use where after groupby instead of having
+df4 = df.groupBy(df.gender).count().where(col(count("count") > 1))
 
 # COMMAND ----------
 
@@ -819,7 +847,7 @@ display(df)
 
 from pyspark.sql.window import Window
 
-window_spec = Window.partitionBy("department_id").orderBy( "salary")
+window_spec = Window.partitionBy("department_id").orderBy( col("salary").desc())
 
 window_df = df.withColumn(
     "row_number",
@@ -841,3 +869,90 @@ spark.conf.set("spark.databricks.delta.rowLevelConcurrencyPreview", "true")
 # Allows multiple writers to update different rows of the same Delta table at the same time, reducing write conflicts.
 # Only conflicting rows fail
 # Non-conflicting updates succeed
+
+# COMMAND ----------
+
+emp_data = [
+["001","101","John Doe","30","Male","50000","2015-01-01"],
+["002","101","Jane Smith","25","Female","45000","2016-02-15"],
+["003","102","Bob Brown","35","Male","55000","2014-05-01"],
+["004","102","Alice Lee","28","Female","48000","2017-09-30"],
+["005","103","Jack Chan","40","Male","60000","2013-04-01"],
+["006","103","Jill Wong","32","Female","52000","2018-07-01"],
+["007","101","James Johnson","42","Male","70000","2012-03-15"],
+["008","102","Kate Kim","29","Female","51000","2019-10-01"],
+["009","103","Tom Tan","33","Male","58000","2016-06-01"],
+["010","104","Lisa Lee","27","Female","47000","2018-08-01"],
+["011","104","David Park","38","Male","65000","2015-11-01"],
+["012","105","Susan Chen","31","Female","54000","2017-02-15"],
+["013","106","Brian Kim","45","Male","75000","2011-07-01"],
+["014","107","Emily Lee","26","Female","46000","2019-01-01"],
+["015","106","Michael Lee","37","Male","63000","2014-09-30"],
+["016","107","Kelly Zhang","30","Female","49000","2018-04-01"],
+["017","105","George Wang","34","Male","57000","2016-03-15"],
+["018","104","Nancy Liu","29","Female","50000","2017-06-01"],
+["019","103","Steven Chen","36","Male","62000","2015-08-01"],
+["020","102","Grace Kim","32","Female","53000","2018-11-01"]
+]
+
+emp_schema = "employee_id string, department_id string, name string, age string, gender string, salary string, hire_date string"
+
+# COMMAND ----------
+
+# regex-replace
+df = spark.createDataFrame(emp_data, emp_schema)
+
+
+# COMMAND ----------
+
+# replae J with Z
+from pyspark.sql.functions import regexp_replace, col
+df = df.withColumn('new_name', regexp_replace(col('name'), "J", "Z"))
+display(df)
+
+
+# COMMAND ----------
+
+df.show(truncate=False) # try to show all datawithin the screen
+
+# COMMAND ----------
+
+# drops null value records.
+# not good thing, not used in prod
+
+df.na.drop()
+
+# COMMAND ----------
+
+# same as sql coalesce , if st value null, use 2nd value
+df12 = df.withColumn("salary_new", coalesce(col("age"), lit("no_age")) )
+
+
+# COMMAND ----------
+
+df.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
+
+
+# COMMAND ----------
+
+df_repartition = df.repartition(2)  # parition become 2 
+df_repartition.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
+
+
+# COMMAND ----------
+
+df_repartition = df.repartition(10)  # parition become 10 
+df_repartition.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
+# can increase and decrease partition
+
+# COMMAND ----------
+
+df_repartition = df.repartition(10, "department_id") # parition is 10 and done on department
+df_repartition.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
+
+
+# COMMAND ----------
+
+df_coalesce = df.coalesce(10)  # parition become 10 
+df_coalesce.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
+# can increase and decrease partition

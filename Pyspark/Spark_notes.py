@@ -71,6 +71,19 @@
                 - That physcial plan is sent to cluster for execution
                 - Once executor receives the phycial plan they run it  against the data partition.
 - DAG ( Directed Acyclic Graph)
+- For 1 spark session there is 1 application ui of spark
+- CreateDataFrame
+                - emp = spark.createDataFrame(data=emp_data, schema=emp_schema)
+                - emp.show()
+- show() is an action, once an action is being called,  in spark ui in SQL/dataframe we can see output
+- any manipulation on the column is considered as an expression
+- in df the column name can have spaces. but never recommended in prod
+- in python none is treaded as NULL
+- WE can increase or decrease the number of partitions using repartition and coalesce.
+                - Reparition can increase or decrease the partition , data shuffling is there. Allows uniform distribution of data.
+                  We can do reparition based on the column as well. which implies same column values will lie in same column. But 1 big demirt is there , it involves shuffling 
+                - Coalesce can only decrease the parition without data shuffling. Doesnt gurantee uniform distribution of data. If we try to increase the partiion via coalesce it will just take the initial partition when the df was created.
+        
 
 
 
