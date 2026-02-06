@@ -30,10 +30,6 @@ emp_schema = "employee_id string, department_id string, name string, age string,
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
 emp= spark.createDataFrame(data=emp_data, schema=emp_schema)
 
 

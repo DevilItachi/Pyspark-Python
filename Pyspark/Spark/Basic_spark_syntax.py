@@ -3,16 +3,14 @@ type(spark)
 
 # COMMAND ----------
 
-# DBTITLE 1,Spark_session
 dir(spark)  #shows all function that can be used by spark
 
 # COMMAND ----------
 
-help(spark.createDataFrame)
+help(spark.createDataFrame)  # to know how the function works
 
 # COMMAND ----------
 
-# DBTITLE 1,Create DF
 my_list = [1,2,3,4,5]
 df = spark.createDataFrame(data = my_list)
 df.show()       # shows in form of dataframe text based
@@ -23,31 +21,6 @@ display(df)     # shows in form of table, databricks only , UI friendly
 # schema and data needs to provided to create a dataframe
 # if schema is not provided, spark will infer the schema
 df.printSchema()
-
-# COMMAND ----------
-
-from pyspark.sql.types import *
-schema = StructType([StructField(name ='id', dataType = IntegerType()) \
-                     ,StructField(name ='name', dataType = StringType()) \
-                     ,StructField(name ='salary', dataType = FloatType())
-                     ])
-
-
-# COMMAND ----------
-
-#StructField("colname", dataType, nullable=True)
-
-schema = StructType([
-    StructField('id', IntegerType(), False),
-    StructField('name', StringType(), True),
-    StructField('salary', FloatType(), True)
-])
-
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Read/write CSV in spark
 
 # COMMAND ----------
 
@@ -66,187 +39,11 @@ display(df_csv)
 
 # COMMAND ----------
 
-# DBTITLE 1,df_from_csv
-# loading multiple csv files which are in same folder use *.csv
-# if files are at different location give all files path 
-# the schema should be same for all csv files
-# pass multiple paths in list 
-
-file_format = "csv"
-file_location = "/Volumes/pyspark_python/pyspark/ext_vol/Customers/"
-df = (
-    spark.read
-    .format(f"{file_format}")
-    .option("header", "true")
-    .option("inferSchema", "true")
-    .load(f"{file_location}*.csv")
-
-)
-
-df2 = (
-    spark.read
-    .format("csv")
-    .option("header", "True")
-    .option("inferSchema", "true")
-    .load( ["/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-100.csv",
-           "/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-1000.csv",
-           "/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-10000.csv"])
-)
-
-# COMMAND ----------
-
-df2.count()
-
-# COMMAND ----------
-
-# write into csv file
-# Just write the file name and not the extensions
-# Multiple csv files are being created as spark works in parallel and partitions 
-# Each file = one partition processed by one task
-# extra files are also created , start , complete, success
-# 4 types of mode avaialble default is Error
-#   1. Append -- if file already exists, adds to it
-#   2. Overwrite -- if file already exists, overwrites it
-#   3. Ignore -- if file already exists, does nothing
-#   4. Error -- if file already exists, throws an error
-
-
-df2.write.csv("/Volumes/pyspark_python/pyspark/ext_vol/Output/Customers_data", header= True , mode = "overwrite")
-
-# COMMAND ----------
-
-df2.selectExpr("spark_partition_id()").distinct().count() # shows number of partitions created
-
-
-# COMMAND ----------
-
-# coalesce(1) means it will create only 1 partition, hence only  1 file will be generated.
-# not good, as it will not be able to process in parallel
-# bad for performance and for big data
-df2.coalesce(1) \
-   .write \
-   .option("header", True) \
-   .mode("overwrite") \
-   .csv("/Volumes/pyspark_python/pyspark/ext_vol/Output/Customers_data")
-
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Read/Write from Json file
-
-# COMMAND ----------
-
-# Nested Json file
-# use multiline option
-
-df = (
-    spark.read
-    .format("json")
-    .option("multiLine", True)
-    .load("/Volumes/pyspark_python/pyspark/ext_vol/Json_input/employees_10KB.json")
-)
-
-# display(df)
-df.printSchema()
-
-# COMMAND ----------
-
-display(df)
-# in bronze layer the data is kept like this only , when moved to dilver, separae columns  are created by withColumn
-
-# COMMAND ----------
-
-# creates a json file which is single line
-# This is the most efficient format for Spark & big data
-# spark cant write in multiline, its not effiecent way.
-# Spark always writes JSON as JSON Lines (NDJSON):
-# 1 row = 1 JSON object
-# 1 object = 1 line
-# Optimized for parallel processing
-# No pretty-print support in Spark writer
-# 4 modes same as csv
-
-df.write.json("/Volumes/pyspark_python/pyspark/ext_vol/Output/sample4.json", mode = "overwrite")
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Parquet Read/write
-
-# COMMAND ----------
-
-# reading parquet file
-# parquet file already contains schema
-# Spark does NOT need to infer schema for Parquet
-
-df1= (
-    spark.read
-    .format("parquet")
-    .load("/Volumes/pyspark_python/pyspark/ext_vol/Parquet_input/iris.parquet")
-)
-display(df1)
-
-# COMMAND ----------
-
-# write to a parquet file
-# 4 modes same as csv
-
-df1.write.parquet("/Volumes/pyspark_python/pyspark/ext_vol/Output/sample6", mode = "overwrite")
-
-# COMMAND ----------
-
-# reading the same parquet which we creating in above cell
-df3 = spark.read.parquet("/Volumes/pyspark_python/pyspark/ext_vol/Output/sample6")
-display(df3)
-
-# COMMAND ----------
-
 print(df_csv.columns) # prints column name in list
 col_name = df_csv.columns  # this can used now further
 print(col_name)
 display(df_csv)
 df_csv.printSchema()
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC With Column usage
-
-# COMMAND ----------
-
-# add a new column or change values of column or datatype of column
-# withcolumn does 3 things
-#   1. If column doesnt exist, it will add a new column
-#   2. If column exist, it will change the value of column
-#   3. If column exist, it will change the datatype of column
-
-from pyspark.sql.functions import col, lit
-#col() → used to refer to a DataFrame column
-#lit() is used to add a constant value to a DataFrame column.
-
-#df = df.withColumn("columnname",col("columnname").cast("datatype"))
-df_csv = df_csv.withColumn("Index",col("Index").cast("int")) # change the datatype of existing column
-
-df_csv.printSchema()
-
-# COMMAND ----------
-
-from pyspark.sql.functions import col, lit
-df_csv = df_csv.withColumn("Salary", lit(100000)) # add a new column
-display(df_csv)
-
-# COMMAND ----------
-
-# change value of existing column
-df_csv = df_csv.withColumn("Salary",col("Salary") * 3)
-display(df_csv)
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC use catalog  pyspark_python;
-# MAGIC use schema pyspark;
 
 # COMMAND ----------
 
@@ -259,6 +56,16 @@ display(df_csv)
 # ✔ no special characters
 
 df_csv.write.saveAsTable("csv_table")
+
+# COMMAND ----------
+
+# writes the DF to delta table
+df_clean.write.mode("overwrite").saveAsTable("csv_table")
+
+
+# COMMAND ----------
+
+spark.sql("select * from csv_table").display()
 
 # COMMAND ----------
 
@@ -280,171 +87,6 @@ df_clean = (
     .withColumnRenamed("Website", "website")
 )
 
-
-# COMMAND ----------
-
-# writes the DF to delta table
-df_clean.write.mode("overwrite").saveAsTable("csv_table")
-
-
-# COMMAND ----------
-
-spark.sql("select * from csv_table").display()
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC StructType() & StructField
-# MAGIC
-# MAGIC Used to define schema manually , nested struct, array & map column
-# MAGIC
-# MAGIC StructType is collection of structField. Struct means a column contains multiple fields, or row inside row 
-# MAGIC
-# MAGIC Import this before use
-# MAGIC
-# MAGIC Define before creating schema
-
-# COMMAND ----------
-
-# from pyspark.sqlTypes import *
-
-from pyspark.sql.types import *
-
-schema = StructType([
-    StructField("id", IntegerType(), True),
-    StructField("name", StringType(), True)
-])
-
-# COMMAND ----------
-
-data = [(1, "John"), (2, "Jane"), (3, "Bob")]
-df = spark.createDataFrame(data, schema)
-df.show()
-
-# COMMAND ----------
-
-# Array type column
-from pyspark.sql.types import *
-
-schema = StructType([
-    StructField("id", IntegerType(), True),
-    StructField("Salary", ArrayType(IntegerType()), True), # array type column
-    StructField ("Skills", StringType(), True),
-    StructField("Name", StringType(), True),
-])
-data = [(1, [100000, 200000 , 300000], "Python", "Amit"), (2, [400000, 500000 , 600000], "java", "Rohit")]
-
-df = spark.createDataFrame(data, schema)
-df.show()
-
-# COMMAND ----------
-
-from pyspark.sql.functions import col
-df.select(col("id"),col("Salary").getItem(0)).show()  
-# select only 1st element from array column and required column. getItem() is used in spark select to fetch item
-
-# COMMAND ----------
-
-from  pyspark.sql.functions import *
-#col() ONLY references existing columns
-
-#df1 = df.withColumn("Salary", col("Salary")[0]).display() 
-df1 = df.withColumn("Salary", col("Salary")[0])          # creating new DF with value from that array column, here salary is not array type
-display(df1)
-
-# COMMAND ----------
-
-# creates a new column of array type and assign value
-df3 = df.withColumn("number",array(lit(10), lit(20)))
-display(df3)
-
-# COMMAND ----------
-
-from pyspark.sql.functions import array, lit, col
-
-df4 = df3.withColumn( "number_id", array(col("id"), lit(5000)) # in array column we can use existing column value
-
-
-display(df4)
-
-
-# COMMAND ----------
-
-from pyspark.sql.functions import *
-
-df5 = df4.withColumn("new_column",explode(col("Salary")))    # creates new rows for each element in array and store them in new column
-
-display(df5)
-
-# COMMAND ----------
-
-df5 =( df4.withColumn("new_column",explode(col("Salary"))) 
-          .withColumn("new_number",explode(col("number"))) )  # multiple explode 
-display(df5)
-
-# COMMAND ----------
-
-df6 = (df4.withColumn("Coding",(lit("Python, Scala, Java"))) 
-        .withColumn("primary", split(col("Coding"), ",").getItem(0))      # split is used to split the string with delimeter and get item
-        .withColumn("secondary", split(col("Coding"), ",").getItem(1))
- )
-display(df6)
-
-# COMMAND ----------
-
-# split() is used to convert a STRING column into an ARRAY, based on a delimiter.
-# only works on strings and not integer
-from pyspark.sql.functions import concat_ws, split, col
-
-df7 = df6.withColumn("Skills_array",split( col("Coding"),","))
-display(df7)
-
-# COMMAND ----------
-
-# array used to create a new column of array type from existing columns of string type
-df8 = df7.withColumn("Skills_learned", array(col("primary"), col("secondary")))
-display(df8)
-
-# COMMAND ----------
-
-# array_contains() used to check if array column has that value
-# if yes then true, if no then false, if array is null it will be null
-from pyspark.sql.functions import array_contains
-df9 = df8.withColumn("Has_skill", array_contains(col("Skills_learned"), "Python"))
-df10 = df8.withColumn("Has_skill", array_contains(col("Skills_learned"), "ADF"))
-display(df9)
-display(df10)
-
-# COMMAND ----------
-
-# Map type column -- its a schema datatype MAP
-# Map is used to represent map Key value pair similar to Dictinoary in Python
-from pyspark.sql.types import *
-
-schema = StructType([
-    StructField("id", IntegerType(), True),
-    StructField("Salary", MapType(StringType(), IntegerType()), True)
-])
-data = [(1, {"Python": 100000, "Scala": 200000 , "Java": 300000})]
-
-df = spark.createDataFrame(data, schema)
-display(df)
-
-# COMMAND ----------
-
-df1 = df.withColumn("Salary",df.Salary["Python"])      # accessing the value of key 
-display(df1)
-
-# COMMAND ----------
-
-from pyspark.sql.functions import *
-df2 = df.select("id","Salary",explode(df.Salary)) # explode() is used to create new rows for each element in array and store them in new column
-df3 = df.withColumn("keys", map_keys(df.Salary)) #map_keys is used to get all keys from map column and creates a araay column
-df4 = df.withColumn("Values", map_values(df.Salary)) #map_values is used to get all values from map column and creates a araay column
-
-display(df2)
-display(df3)
-display(df4)
 
 # COMMAND ----------
 
@@ -660,13 +302,6 @@ display(df_emp.groupby("department_id").pivot("Job_id", ["FI_ACCOUNT"]).count())
 
 # COMMAND ----------
 
-# unpivot 
-#column to row
-
-
-
-# COMMAND ----------
-
 # fill & fillna
 # used to replace null/none on all or selected multiple DF column with either zero, empty  string or any other value
 # fillna(value) only applies to columns whose data type matches the type of value.
@@ -716,11 +351,6 @@ display(df5)
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC Samples
-
-# COMMAND ----------
-
 df = spark.range(start =1 , end=10)
 display(df)
 
@@ -752,11 +382,6 @@ print(df1)
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC Dataframe Transform
-
-# COMMAND ----------
-
 def doublenumber(df):
     return df.withColumn("doube_number",df.id*2)
 
@@ -764,11 +389,6 @@ df2 = df.transform(doublenumber)
 display(df2)
 
 # create a function and then use it with df.transform
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Temp views
 
 # COMMAND ----------
 
@@ -795,44 +415,6 @@ spark.catalog.currentDatabase
 spark.catalog.listDatabases()
 spark.catalog.listTables()
 
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC UDF
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC Partition by
-
-# COMMAND ----------
-
-df2 = (
-    spark.read
-    .format("csv")
-    .option("header", "True")
-    .option("inferSchema", "true")
-    .load( ["/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-100.csv",
-           "/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-1000.csv",
-           "/Volumes/pyspark_python/pyspark/ext_vol/Customers/customers-10000.csv"])
-)
-display(df2)
-
-# COMMAND ----------
-
-df2.write.parquet("/Volumes/pyspark_python/pyspark/ext_vol/Output/partition", mode = "overwrite", partitionBy="Country")
-
-#  data is stored in location in  partition by country
-# for each country a sseprate folder will be created
-#  when you read data from specific country folder only that data will be read
-
-
-
-# COMMAND ----------
-
-df_all = spark.read.parquet("/Volumes/pyspark_python/pyspark/ext_vol/Output/partition")  # reads from all partitions
-display(df_all)
 
 # COMMAND ----------
 

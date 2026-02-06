@@ -1,3 +1,0 @@
-Broadcast join
-coalesce
-repartition

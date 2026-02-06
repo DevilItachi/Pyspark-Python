@@ -6,10 +6,11 @@
         2. Strucutered API - Dataframes and Datasets and SQL
         3. Libraries & ecosysytems , strucutral streamiong and advances analytics
 - Driver
-        - IT is heart if spark
+        - It is heart if spark
         - Manages information and state of executors
         - Analyse , distribute and schedule work on executors
         - GIves instrucition to executors
+        - Collects the end results from the executors
         - Cluster manager resides in Driver, which is mostly YARN or Kubernetes
 - Executors
         - Execute the actual work
@@ -71,6 +72,10 @@
                 - That physcial plan is sent to cluster for execution
                 - Once executor receives the phycial plan they run it  against the data partition.
 - DAG ( Directed Acyclic Graph)
+                - Directed  Means which is directly connected from one node to another. This creates a sequence
+                - Acyclic  Defines that there is no cycle or loop available.
+                - Graph  it is a combination of vertices and edges. 
+
 - For 1 spark session there is 1 application ui of spark
 - CreateDataFrame
                 - emp = spark.createDataFrame(data=emp_data, schema=emp_schema)
@@ -81,7 +86,7 @@
 - in python none is treaded as NULL
 - WE can increase or decrease the number of partitions using repartition and coalesce.
                 - Reparition can increase or decrease the partition , data shuffling is there. Allows uniform distribution of data.
-                  We can do reparition based on the column as well. which implies same column values will lie in same column. But 1 big demirt is there , it involves shuffling 
+                  We can do reparition based on the column as well. which implies same column values will lie in same column. But 1 big demerit is there , it involves shuffling 
                 - Coalesce can only decrease the parition without data shuffling. Doesnt gurantee uniform distribution of data. If we try to increase the partiion via coalesce it will just take the initial partition when the df was created.
         
 
