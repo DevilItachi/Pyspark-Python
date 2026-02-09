@@ -23,8 +23,7 @@ display(df_csv)
 # COMMAND ----------
 
 # change value of existing column
-df_csv = df_csv.withColumn("Salary",col("Salary") * 3)
-display(df_csv)
+cdisplay(df_csv)
 
 # COMMAND ----------
 

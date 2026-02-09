@@ -42,7 +42,6 @@ display(df_csv)
 print(df_csv.columns) # prints column name in list
 col_name = df_csv.columns  # this can used now further
 print(col_name)
-display(df_csv)
 df_csv.printSchema()
 
 # COMMAND ----------
@@ -55,7 +54,7 @@ df_csv.printSchema()
 # ✔ no spaces
 # ✔ no special characters
 
-df_csv.write.saveAsTable("csv_table")
+df_csv.write.saveAsTable("csv_table") # deafult mode is errorIfExists , so if table exisits it fails
 
 # COMMAND ----------
 
@@ -506,7 +505,7 @@ df.na.drop()
 
 # COMMAND ----------
 
-# same as sql coalesce , if st value null, use 2nd value
+# same as sql coalesce , if 1st value null, use 2nd value
 df12 = df.withColumn("salary_new", coalesce(col("age"), lit("no_age")) )
 
 
